@@ -57,16 +57,16 @@ const initialAddresses: Address[] = [
 ];
 
 export default function Home() {
-  // Criamos um estado `addresses` para armazenar e atualizar a lista de endereços dinâmicos
-  const [addresses, setAddresses] = useState(initialAddresses);
+  const [address, setAddress] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
+
   const [textValue, setTextValue] = useState("");
 
   async function handleGetAddress() {
     setLoading(true);
 
     try {
-      // Obtém o endereço a partir do CEP usando a função `getAddress`
       const result = await getAddress(textValue);
 
       if (result?.erro === "true") {
@@ -74,20 +74,9 @@ export default function Home() {
         return;
       }
 
-      // Cria um novo objeto de endereço com os dados obtidos
-      const newAddress = {
-        id: (addresses.length + 1).toString(),
-        bairro: result.bairro,
-        cep: result.cep,
-        complemento: result.complemento || "",
-        ddd: result.ddd,
-        localidade: result.localidade,
-        logradouro: result.logradouro,
-        uf: result.uf,
-      };
-
-      // Atualiza o estado `addresses` inserindo o novo endereço no início da lista
-      setAddresses([newAddress, ...addresses]);
+      // Adiciona o novo endereço na primeira posição do array
+      const newAddresses = [result, ...addresses];
+      setAddresses(newAddresses);
     } catch (error) {
       console.log(error);
       alert("Ocorreu um erro ao obter o endereço.");
@@ -97,7 +86,7 @@ export default function Home() {
   }
 
   return (
-    <div>
+    <div className="">
       <h1>Página Home</h1>
 
       <div className="flex flex-col gap-2">
@@ -120,9 +109,8 @@ export default function Home() {
       </div>
 
       <ul>
-        {/* Mapeia o array de endereços dinâmicos `addresses` para renderizar na tela */}
         {addresses.map((address) => (
-          <li key={address.id}>{address.localidade}</li>
+          <li key={address.id}>{address.logradouro}</li>
         ))}
       </ul>
     </div>
