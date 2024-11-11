@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { getAddress } from "../../get-address";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 type Address = {
   id: string;
@@ -11,6 +13,7 @@ type Address = {
   localidade: string; // Cidade
   logradouro: string;
   uf: string;
+  consultedAt: Date;
 };
 
 const initialAddresses: Address[] = [
@@ -23,6 +26,7 @@ const initialAddresses: Address[] = [
     localidade: "São Paulo",
     logradouro: "Praça da Sé",
     uf: "SP",
+    consultedAt: new Date(),
   },
   {
     id: "2",
@@ -33,6 +37,7 @@ const initialAddresses: Address[] = [
     localidade: "Rio de Janeiro",
     logradouro: "Avenida Atlântica",
     uf: "RJ",
+    consultedAt: new Date(),
   },
   {
     id: "3",
@@ -43,6 +48,7 @@ const initialAddresses: Address[] = [
     localidade: "Belo Horizonte",
     logradouro: "Rua Pernambuco",
     uf: "MG",
+    consultedAt: new Date(),
   },
   {
     id: "4",
@@ -53,8 +59,18 @@ const initialAddresses: Address[] = [
     localidade: "Fortaleza",
     logradouro: "Rua Silva Jatahy",
     uf: "CE",
+    consultedAt: new Date(),
   },
 ];
+
+function formatDate(date: Date) {
+  const result = formatDistanceToNow(new Date(date), {
+    includeSeconds: true,
+    locale: ptBR,
+  });
+
+  return result;
+}
 
 export default function Home() {
   const [address, setAddress] = useState(null);
@@ -68,14 +84,21 @@ export default function Home() {
 
     try {
       const result = await getAddress(textValue);
-
+      console.log(result);
       if (result?.erro === "true") {
         alert("CEP inválido.");
         return;
       }
 
+      const newAddress: Address = {
+        id: self.crypto.randomUUID(),
+        consultedAt: new Date(),
+        ...result,
+      };
+      console.log(newAddress);
+
       // Adiciona o novo endereço na primeira posição do array
-      const newAddresses = [result, ...addresses];
+      const newAddresses = [newAddress, ...addresses];
       setAddresses(newAddresses);
     } catch (error) {
       console.log(error);
@@ -110,7 +133,9 @@ export default function Home() {
 
       <ul>
         {addresses.map((address) => (
-          <li key={address.id}>{address.logradouro}</li>
+          <li key={address.id}>
+            {address.logradouro}, {formatDate(address.consultedAt)}
+          </li>
         ))}
       </ul>
     </div>
