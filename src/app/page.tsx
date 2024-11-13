@@ -3,6 +3,7 @@ import { useState } from "react";
 import { getAddress } from "../../get-address";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { MdOutlineDelete } from "react-icons/md";
 
 type Address = {
   id: string;
@@ -18,7 +19,7 @@ type Address = {
 
 const initialAddresses: Address[] = [
   {
-    id: "1",
+    id: self.crypto.randomUUID(),
     bairro: "Centro",
     cep: "01001-000",
     complemento: "Apto 101",
@@ -29,7 +30,7 @@ const initialAddresses: Address[] = [
     consultedAt: new Date(),
   },
   {
-    id: "2",
+    id: self.crypto.randomUUID(),
     bairro: "Copacabana",
     cep: "22041-001",
     complemento: "Bloco B, Ap 502",
@@ -40,7 +41,7 @@ const initialAddresses: Address[] = [
     consultedAt: new Date(),
   },
   {
-    id: "3",
+    id: self.crypto.randomUUID(),
     bairro: "Savassi",
     cep: "30140-071",
     complemento: "Loja 3",
@@ -51,7 +52,7 @@ const initialAddresses: Address[] = [
     consultedAt: new Date(),
   },
   {
-    id: "4",
+    id: self.crypto.randomUUID(),
     bairro: "Meireles",
     cep: "60160-230",
     complemento: "Casa 10",
@@ -108,8 +109,14 @@ export default function Home() {
     }
   }
 
+  async function handleDeleteAddress(id: string) {
+    console.log(id)
+    const filteredAddresses = addresses.filter((address) => address.id !== id);
+    console.log(filteredAddresses);
+  }
+
   return (
-    <div className="">
+    <div className="flex flex-col items-center">
       <h1>Página Home</h1>
 
       <div className="flex flex-col gap-2">
@@ -131,13 +138,37 @@ export default function Home() {
         </button>
       </div>
 
-      <ul>
-        {addresses.map((address) => (
-          <li key={address.id}>
-            {address.logradouro}, {formatDate(address.consultedAt)}
-          </li>
-        ))}
-      </ul>
+      <table className="table-auto [&>*>*>*]:border-2">
+        <thead>
+          <tr className="[&>*]:px-4 [&>*]:py-2">
+            <th>Logradouro</th>
+            <th>Bairro</th>
+            <th>Localidade</th>
+            <th>UF</th>
+            <th>CEP</th>
+            <th>Consultado em</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {addresses.map((address) => (
+            <tr key={address.id} className="[&>*]:px-4 [&>*]:py-2">
+              <td>{address.logradouro}</td>
+              <td>{address.bairro}</td>
+              <td>{address.localidade}</td>
+              <td>{address.uf}</td>
+              <td>{address.cep}</td>
+              <td>{formatDate(address.consultedAt)}</td>
+              <td>
+                <button onClick={() => handleDeleteAddress(address.id)} className="bg-red-300 p-0.5 flex items-center">
+                  <MdOutlineDelete size={24} />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
